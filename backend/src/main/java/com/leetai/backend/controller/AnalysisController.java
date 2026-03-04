@@ -24,7 +24,10 @@ public class AnalysisController {
                         return Mono.error(new RuntimeException("User not found or API error"));
                     }
                     stats.setUsername(username);
-                    return groqAiService.analyzeProfile(stats);
+                    return groqAiService.analyzeProfile(stats).map(res -> {
+                        res.setUserStats(stats);
+                        return res;
+                    });
                 })
                 .map(res -> ResponseEntity.ok((Object) res))
                 .onErrorResume(e -> {

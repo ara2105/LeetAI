@@ -16,6 +16,22 @@ export interface TopicSkill {
     proficiencyLevel: number;
 }
 
+export interface LeetCodeStats {
+    username: string;
+    totalSolved: number;
+    totalQuestions: number;
+    easySolved: number;
+    totalEasy: number;
+    mediumSolved: number;
+    totalMedium: number;
+    hardSolved: number;
+    totalHard: number;
+    acceptanceRate: number;
+    ranking: number;
+    contributionPoints: number;
+    reputation: number;
+}
+
 export interface AnalysisResponse {
     readinessScore: number;
     topicSkills: TopicSkill[];
@@ -23,4 +39,5 @@ export interface AnalysisResponse {
     roadmap: RoadmapWeek[];
     recommendations: Recommendation[];
     summary: string;
+    userStats: LeetCodeStats;
 }

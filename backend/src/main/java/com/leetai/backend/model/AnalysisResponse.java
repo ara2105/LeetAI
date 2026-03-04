@@ -11,6 +11,7 @@ public class AnalysisResponse {
     private List<RoadmapWeek> roadmap;
     private List<RecommendedProblem> recommendations;
     private String summary;
+    private LeetCodeStats userStats;
 
     @Data
     public static class TopicSkill {

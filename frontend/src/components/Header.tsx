@@ -1,32 +1,53 @@
-import { TerminalSquare, Settings, LayoutDashboard } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { cn } from '../lib/utils';
 
 export default function Header() {
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
+    const username = searchParams.get('username') || '';
+
+    const path = location.pathname;
+
+    const navItems = [
+        { label: 'Home', path: '/' },
+        { label: 'Analyze', path: '/' },
+        { label: 'Dashboard', path: '/dashboard' },
+        { label: 'Roadmap', path: '/roadmap' },
+        { label: 'Weekly Report', path: '/weekly-report' },
+    ];
+
+    const getLink = (basePath: string) => {
+        if (basePath === '/') return '/';
+        return username ? `${basePath}?username=${username}` : basePath;
+    };
+
     return (
-        <header className="fixed top-0 w-full h-16 border-b border-white/10 bg-[#0A0A0A]/90 backdrop-blur-md z-50 flex items-center justify-between px-6">
-            <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-white transition-opacity hover:opacity-80">
-                <TerminalSquare className="w-5 h-5 text-brand-500" />
-                LeetAI
+        <header className="w-full h-16 bg-[#111111] border-b border-white/[0.05] flex items-center justify-between px-8">
+            <Link to="/" className="text-xl font-bold tracking-tight text-white hover:opacity-80 transition-opacity">
+                Leet<span className="text-brand-500">Ai</span>
             </Link>
 
-            <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-1">
-                    <button className="px-3 py-1.5 text-sm font-medium text-white bg-white/10 shadow-sm rounded-md flex items-center gap-2">
-                        <LayoutDashboard className="w-4 h-4" />
-                        Overview
-                    </button>
-                    <button className="px-3 py-1.5 text-sm font-medium text-gray-400 hover:text-white transition-colors rounded-md flex items-center gap-2">
-                        <Settings className="w-4 h-4" />
-                        Settings
-                    </button>
-                </div>
-
-                <div className="w-px h-6 bg-white/10 mx-2 hidden md:block" />
-
-                <button className="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-sm font-bold shadow-lg ring-2 ring-white/10">
-                    User
-                </button>
-            </div>
+            <nav className="flex items-center gap-6">
+                {navItems.map((item) => {
+                    const isActive = path === item.path && (item.path !== '/' || (item.label === 'Home' && path === '/'));
+                    // Note: 'Analyze' also links to '/' but we handle active logic loosely for the landing page.
+                    // If we are on landing page, 'Home' is active unless explicitly handling Analyze.
+                    return (
+                        <Link
+                            key={item.label}
+                            to={getLink(item.path)}
+                            className={cn(
+                                "text-sm font-medium transition-colors px-3 py-1.5 rounded-md",
+                                isActive
+                                    ? "bg-white/[0.08] text-white"
+                                    : "text-gray-400 hover:text-white"
+                            )}
+                        >
+                            {item.label}
+                        </Link>
+                    );
+                })}
+            </nav>
         </header>
     );
 }
