@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  --background: #000000;
+  --foreground: #ededed;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Custom utility colors for LeetAI */
+.text-leetcode-orange {
+  color: #FFA116;
+}
+.bg-leetcode-orange {
+  background-color: #FFA116;
+}
+.text-leetcode-easy {
+  color: #00b8a3;
+}
+.bg-leetcode-easy {
+  background-color: #00b8a3;
+}
+.text-leetcode-medium {
+  color: #ffc01e;
+}
+.bg-leetcode-medium {
+  background-color: #ffc01e;
+}
+.text-leetcode-hard {
+  color: #ff375f;
+}
+.bg-leetcode-hard {
+  background-color: #ff375f;
+}
