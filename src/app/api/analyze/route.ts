@@ -113,11 +113,6 @@ function generateAnalysis(data: LeetCodeData): ProfileAnalysis {
   // Analyze Topics
   const dpCount = data.topicTags["Dynamic Programming"] || 0;
   const graphCount = (data.topicTags["Graph"] || 0) + (data.topicTags["Depth-First Search"] || 0);
-  const arrayCount = (data.topicTags["Array"] || 0) + (data.topicTags["Hash Table"] || 0);
-
-  if (arrayCount > 50) {
-    pros.push(`Solid mastery of fundamental data structures (Arrays & Hashing) (${arrayCount} solved).`);
-  }
 
   if (dpCount > 40) {
     pros.push(`Strong foundation in Dynamic Programming (${dpCount} solved).`);
@@ -137,6 +132,22 @@ function generateAnalysis(data: LeetCodeData): ProfileAnalysis {
       targetQuestions: 15,
       reasoning: "Essential for solving complex matrix and relationship problems."
     });
+  }
+
+  // Broad analysis of uncovered categories
+  const coreTopics = ["Array", "String", "Hash Table", "Math", "Sorting", "Greedy", "Tree", "Binary Search", "Matrix", "Two Pointers", "Bit Manipulation", "Stack"];
+  const uncovered = coreTopics.filter(t => !data.topicTags[t] || data.topicTags[t] < 3);
+
+  if (uncovered.length > 0) {
+    const subset = uncovered.slice(0, 4);
+    cons.push(`Significant gap in essential computer science categories: you have scarcely touched ${subset.join(", ")}.`);
+    roadmap.push({
+      focusTopic: "Arrays & Strings (The Basics)",
+      targetQuestions: 10,
+      reasoning: `Broaden your toolkit by practicing ${subset[0]} and ${subset[1] || 'basic structures'}.`
+    });
+  } else {
+    pros.push(`Solid horizontal mastery across all ${coreTopics.length} core algorithmic topics.`);
   }
 
   // Edge Case Handling for complete beginners

@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { AlertTriangle, ExternalLink, Loader2, Info, X } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Radar, 
   RadarChart, 
@@ -14,30 +14,42 @@ import {
 import type { ProfileAnalysis } from "@/types";
 
 function DashboardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const username = searchParams.get("user");
+  const urlUser = searchParams.get("user");
   const [data, setData] = useState<ProfileAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [solvedSlugs, setSolvedSlugs] = useState<Set<string>>(new Set());
+  const [activeUser, setActiveUser] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load manually solved slugs from LocalStorage to hide them from recommendations
-    // as LeetCode's public API only returns aggregate totals, not specific problem histories.
-    const saved = localStorage.getItem("leetai_solved_slugs");
-    if (saved) {
-      try {
-        setSolvedSlugs(new Set(JSON.parse(saved)));
-      } catch (e) {}
+    const savedSlugs = localStorage.getItem("leetai_solved_slugs");
+    if (savedSlugs) {
+      try { setSolvedSlugs(new Set(JSON.parse(savedSlugs))); } catch (e) {}
     }
 
-    if (!username) {
-      setError("No username provided. Please go back and enter a username.");
-      setLoading(false);
+    const savedUser = localStorage.getItem("leetai_last_user");
+    
+    // If we land on /dashboard without a user but have one saved, silently redirect
+    if (!urlUser && savedUser) {
+      router.replace(`?user=${savedUser}`);
       return;
     }
+    
+    if (urlUser) {
+      localStorage.setItem("leetai_last_user", urlUser);
+      setActiveUser(urlUser);
+    } else {
+      setError("No username provided. Please go back and enter a username.");
+      setLoading(false);
+    }
+  }, [urlUser, router]);
 
-    fetch(`/api/analyze?username=${encodeURIComponent(username)}`)
+  useEffect(() => {
+    if (!activeUser) return;
+
+    fetch(`/api/analyze?username=${encodeURIComponent(activeUser)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch LeetCode data or user not found.");
         return res.json();
@@ -45,7 +57,7 @@ function DashboardContent() {
       .then((resData: ProfileAnalysis) => setData(resData))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [username]);
+  }, [activeUser]);
 
   const markProblemAsSolved = (slug: string, e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to LeetCode
@@ -118,7 +130,7 @@ function DashboardContent() {
   return (
     <div className="w-full max-w-7xl mx-auto px-6 py-10 font-sans text-zinc-300">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Dashboard ({data.stats.username})</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
         <p className="text-zinc-400 text-sm">Your interview readiness based on real-time LeetCode data.</p>
       </div>
 
